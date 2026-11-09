@@ -284,7 +284,7 @@ public class VistaConsola {
     }
 
     private int leerOpcion(String mensaje) {
-        while (true) {
+        while (scanner.hasNextLine()) {
             String valor = leerTexto(mensaje);
             try {
                 return Integer.parseInt(valor);
@@ -292,6 +292,7 @@ public class VistaConsola {
                 System.out.println("Ingresa un número entero.");
             }
         }
+        return 0;
     }
 
     private int leerId(String mensaje) {
@@ -299,7 +300,7 @@ public class VistaConsola {
     }
 
     private int leerEntero(String mensaje) {
-        while (true) {
+        while (scanner.hasNextLine()) {
             String valor = leerTexto(mensaje);
             try {
                 return Integer.parseInt(valor);
@@ -307,6 +308,7 @@ public class VistaConsola {
                 System.out.println("Ingresa un número entero.");
             }
         }
+        return 0;
     }
 
     private Float convertirDecimal(String valor, String campo) {

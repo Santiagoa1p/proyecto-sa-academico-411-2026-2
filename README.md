@@ -57,7 +57,7 @@ classDiagram
 6.  **Pruebas:** Asegúrate de que tu código pase los tests de validación del docente.
 
 ## Configuración de BD:
-El proyecto utiliza PostgreSQL (incluido Neon). Copia `config.example.properties` como `config.properties` y reemplaza los valores de ejemplo por los datos de conexión de Neon (`URL`, `USERNAME` y `PASSWORD`). El archivo `config.properties` está ignorado por Git para no publicar credenciales. Para crear las tablas, conecta DBeaver a la base Neon y ejecuta una vez el script `src/main/resources/db/schema-postgres.sql`.
+El proyecto utiliza PostgreSQL (incluido Neon). Configura las propiedades `URL`, `USERNAME` y `PASSWORD` en tu archivo `config.properties` de la raíz del proyecto. Ese archivo está ignorado por Git para no publicar credenciales. Para crear las tablas, conecta DBeaver a Neon y ejecuta una vez `src/main/resources/db/schema-postgres.sql`.
 
 ## Ejecutar la aplicación
 
