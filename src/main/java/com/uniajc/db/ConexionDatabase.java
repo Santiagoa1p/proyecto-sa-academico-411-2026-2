@@ -4,66 +4,32 @@ package com.uniajc.db;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-// Otras importaciones necesarias para gestionar archivos de propiedades
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.IOException;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 public class ConexionDatabase {
-    // Conexión única (singleton)
-    private static Connection connection = null;
-
-    /**
-     * Obtiene la conexión a la base de datos. Si no existe, la crea usando
-     * config.properties.
-     * 
-     * @return Objeto Connection listo para usar.
-     */
-    public static Connection getConnection() {
-
-        Properties properties = new Properties();
-
-        if (connection == null) {
-            try {
-
-                // Cargar las propiedades desde el archivo config.properties
-                properties.load(new FileInputStream(new File("config.properties")));
-
-                // Leer los parámetros de conexión
-                String url = properties.get("URL").toString();
-                String user = properties.get("USERNAME").toString();
-                String password = properties.get("PASSWORD").toString();
-
-                // Establecer la conexión
-                connection = DriverManager.getConnection(url, user, password);
-                System.out.println("Conexion exitosa.");
-            } catch (SQLException error) {
-                System.out.println("Failed to establish connection. " + error.getMessage());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return connection;
+    private ConexionDatabase() {
     }
 
-    /**
-     * Cierra la conexión a la base de datos si está abierta.
-     */
-    public static void closeConnection() {
-        if (connection != null) {
-            try {
-                connection.close();
-                System.out.println("Connection closed successfully.");
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.out.println("Failed to close connection. " + e.getMessage());
-            }
+    public static Connection getConnection() throws SQLException {
+        Properties properties = new Properties();
+
+        try (InputStream input = Files.newInputStream(Path.of("config.properties"))) {
+            properties.load(input);
+        } catch (IOException e) {
+            throw new SQLException("No se pudo cargar config.properties.", e);
         }
+
+        String url = properties.getProperty("URL");
+        if (url == null || url.isBlank()) {
+            throw new SQLException("La propiedad URL no está configurada en config.properties.");
+        }
+
+        String username = properties.getProperty("USERNAME", "");
+        String password = properties.getProperty("PASSWORD", "");
+        return DriverManager.getConnection(url.trim(), username.trim(), password);
     }
 }

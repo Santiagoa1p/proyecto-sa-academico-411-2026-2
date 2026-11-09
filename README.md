@@ -17,6 +17,7 @@ classDiagram
         +int id_docente
         +string nombre
         +string especialidad
+        +string email
     }
 
     class Materia {
@@ -56,7 +57,7 @@ classDiagram
 6.  **Pruebas:** Asegúrate de que tu código pase los tests de validación del docente.
 
 ## Configuración de BD:
-Usa el archivo `config.properties` en la raíz para configurar tu conexión a MySQL, Postgres (Neon) o SQLite local.
+El proyecto utiliza PostgreSQL (incluido Neon). Configura `URL`, `USERNAME` y `PASSWORD` en `config.properties` en la raíz del proyecto. Ejecuta una vez el script `src/main/resources/db/schema-postgres.sql` en la base de datos antes de iniciar la aplicación.
 
 ---
 *Recuerda: El Modelo nunca debe hablar con el usuario (sin System.out). El Controlador orquesta y la Vista interactúa.*
