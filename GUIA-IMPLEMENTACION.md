@@ -808,8 +808,8 @@ CREATE TABLE "practica-mvc".inscripciones (
 
 ### Capa Vista (Swing)
 
-- [ ] Crear clase que extienda JPanel
-- [ ] Inyectar Service en constructor
+- [ ] Agregar una pestaña a `VistaPrincipalSwing`
+- [ ] Conectar la vista con su controlador
 - [ ] Crear panel de búsqueda
 - [ ] Crear JTable con modelo
 - [ ] Crear botones de CRUD
@@ -819,9 +819,9 @@ CREATE TABLE "practica-mvc".inscripciones (
 
 ### Integración
 
-- [ ] Agregar opción en menú de `VistaPrincipalSwing`
-- [ ] Crear instancia en el constructor de `VistaPrincipalSwing`
-- [ ] Agregar al CardLayout del panel contenedor
+- [ ] Crear el controlador e inyectar el servicio correspondiente en `Main`
+- [ ] Agregar la pestaña y su adaptador en `VistaPrincipalSwing`
+- [ ] Mantener la opción de consola en `VistaConsola`
 
 ---
 
@@ -942,8 +942,16 @@ mvn test
 
 ### Ejecutar la Aplicación
 
-```bash
-mvn exec:java -Dexec.mainClass="com.uniajc.Main"
+En PowerShell, la consola es la opción predeterminada:
+
+```powershell
+mvn exec:java '-Dexec.mainClass=com.uniajc.Main'
+```
+
+Para abrir la interfaz Swing:
+
+```powershell
+mvn exec:java '-Dexec.mainClass=com.uniajc.Main' '-Dexec.args=--swing'
 ```
 
 ### Empaquetar JAR
