@@ -20,11 +20,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.List;
@@ -43,7 +45,7 @@ public class VistaPrincipalSwing extends JFrame {
         setSize(900, 560);
         setLocationRelativeTo(null);
 
-        javax.swing.JTabbedPane pestañas = new javax.swing.JTabbedPane();
+        JTabbedPane pestañas = new JTabbedPane();
         pestañas.addTab("Estudiantes", new PanelCrud<>(new Adaptador<Estudiante>() {
             public String nombre() { return "estudiante"; }
             public String[] columnas() { return new String[]{"ID", "Nombre", "Apellido", "Email"}; }
@@ -164,6 +166,15 @@ public class VistaPrincipalSwing extends JFrame {
         }));
 
         add(pestañas, BorderLayout.CENTER);
+        pestañas.addChangeListener(evento -> cargarPestanaSeleccionada(pestañas));
+        SwingUtilities.invokeLater(() -> cargarPestanaSeleccionada(pestañas));
+    }
+
+    private static void cargarPestanaSeleccionada(JTabbedPane pestañas) {
+        Component seleccionada = pestañas.getSelectedComponent();
+        if (seleccionada instanceof PanelCrud<?> panel) {
+            panel.cargarSiNecesario();
+        }
     }
 
     private static int entero(String valor, String campo) {
@@ -205,6 +216,7 @@ public class VistaPrincipalSwing extends JFrame {
         private final DefaultTableModel modelo;
         private final JTable tabla;
         private final JTextField textoBusqueda;
+        private boolean cargado;
 
         private PanelCrud(Adaptador<T> adaptador) {
             super(new BorderLayout(8, 8));
@@ -236,7 +248,12 @@ public class VistaPrincipalSwing extends JFrame {
             agregarBoton(botones, "Eliminar", this::eliminar);
             agregarBoton(botones, "Actualizar lista", this::cargar);
             add(botones, BorderLayout.SOUTH);
-            SwingUtilities.invokeLater(() -> ejecutar(this::cargar));
+        }
+
+        private void cargarSiNecesario() {
+            if (!cargado) {
+                ejecutar(this::cargar);
+            }
         }
 
         private void agregarBoton(JPanel panel, String texto, Runnable accion) {
@@ -253,6 +270,7 @@ public class VistaPrincipalSwing extends JFrame {
                     .map(adaptador::fila)
                     .filter(fila -> busqueda.isEmpty() || coincide(fila, busqueda))
                     .forEach(modelo::addRow);
+            cargado = true;
         }
 
         private boolean coincide(Object[] fila, String busqueda) {
