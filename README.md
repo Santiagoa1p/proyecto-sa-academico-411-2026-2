@@ -63,6 +63,7 @@ El proyecto utiliza PostgreSQL (incluido Neon). Configura las propiedades `URL`,
 
 - Consola con `Scanner` (PowerShell): `mvn exec:java '-Dexec.mainClass=com.uniajc.Main'`
 - Interfaz Swing (PowerShell): `mvn exec:java '-Dexec.mainClass=com.uniajc.Main' '-Dexec.args=--swing'`
+- Desde VS Code: abre la carpeta del proyecto, selecciona **Sistema académico (Swing)** en **Run and Debug** y ejecútalo con `F5`.
 
 ---
 *Recuerda: El Modelo nunca debe hablar con el usuario (sin System.out). El Controlador orquesta y la Vista interactúa.*
