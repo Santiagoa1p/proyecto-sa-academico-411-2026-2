@@ -28,6 +28,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public class VistaPrincipalSwing extends JFrame {
@@ -203,6 +204,7 @@ public class VistaPrincipalSwing extends JFrame {
         private final Adaptador<T> adaptador;
         private final DefaultTableModel modelo;
         private final JTable tabla;
+        private final JTextField textoBusqueda;
 
         private PanelCrud(Adaptador<T> adaptador) {
             super(new BorderLayout(8, 8));
@@ -216,6 +218,14 @@ public class VistaPrincipalSwing extends JFrame {
             this.tabla = new JTable(modelo);
             tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             tabla.setRowHeight(24);
+
+            JPanel busqueda = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            busqueda.add(new JLabel("Buscar:"));
+            textoBusqueda = new JTextField(24);
+            busqueda.add(textoBusqueda);
+            agregarBoton(busqueda, "Buscar", this::cargar);
+            add(busqueda, BorderLayout.NORTH);
+
             JScrollPane scroll = new JScrollPane(tabla);
             scroll.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
             add(scroll, BorderLayout.CENTER);
@@ -238,7 +248,20 @@ public class VistaPrincipalSwing extends JFrame {
         private void cargar() {
             List<T> entidades = adaptador.listar();
             modelo.setRowCount(0);
-            entidades.forEach(entidad -> modelo.addRow(adaptador.fila(entidad)));
+            String busqueda = textoBusqueda.getText().trim().toLowerCase(Locale.ROOT);
+            entidades.stream()
+                    .map(adaptador::fila)
+                    .filter(fila -> busqueda.isEmpty() || coincide(fila, busqueda))
+                    .forEach(modelo::addRow);
+        }
+
+        private boolean coincide(Object[] fila, String busqueda) {
+            for (Object valor : fila) {
+                if (valor != null && valor.toString().toLowerCase(Locale.ROOT).contains(busqueda)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void registrar() {
