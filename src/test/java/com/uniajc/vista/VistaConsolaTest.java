@@ -55,6 +55,37 @@ class VistaConsolaTest {
     }
 
     @Test
+    void permiteRegistrarEditarEliminarYListarDesdeElMenu() {
+        EstudianteDaoEnMemoria estudianteDao = new EstudianteDaoEnMemoria();
+        VistaConsola vista = crearVista(
+                "1\n"
+                        + "2\nAna\nPérez\nana@example.com\n"
+                        + "3\n1\nAna María\nPérez López\nana.maria@example.com\n"
+                        + "1\n"
+                        + "4\n1\n"
+                        + "1\n"
+                        + "0\n0\n",
+                estudianteDao);
+        ByteArrayOutputStream salida = new ByteArrayOutputStream();
+        PrintStream salidaOriginal = System.out;
+
+        try (PrintStream capturada = new PrintStream(salida, true, StandardCharsets.UTF_8)) {
+            System.setOut(capturada);
+            vista.iniciar();
+        } finally {
+            System.setOut(salidaOriginal);
+        }
+
+        String texto = salida.toString(StandardCharsets.UTF_8);
+        assertTrue(estudianteDao.estudiantes.isEmpty());
+        assertTrue(texto.contains("Estudiante registrado."));
+        assertTrue(texto.contains("Estudiante actualizado."));
+        assertTrue(texto.contains("Estudiante eliminado."));
+        assertTrue(texto.contains("Ana María Pérez López"));
+        assertTrue(texto.contains("No hay estudiantes registrados."));
+    }
+
+    @Test
     void terminaSiLaEntradaAcabaDespuesDeUnaOpcionInvalida() {
         VistaConsola vista = crearVista("opción-inválida\n", new EstudianteDaoEnMemoria());
         ByteArrayOutputStream salida = new ByteArrayOutputStream();
@@ -106,6 +137,21 @@ class VistaConsolaTest {
             return estudiantes.stream()
                     .filter(estudiante -> estudiante.getIdEstudiante() == id)
                     .findFirst();
+        }
+
+        @Override
+        public void actualizar(Estudiante estudiante) {
+            buscarPorId(estudiante.getIdEstudiante())
+                    .ifPresent(actual -> {
+                        actual.setNombre(estudiante.getNombre());
+                        actual.setApellido(estudiante.getApellido());
+                        actual.setEmail(estudiante.getEmail());
+                    });
+        }
+
+        @Override
+        public void eliminar(int id) {
+            estudiantes.removeIf(estudiante -> estudiante.getIdEstudiante() == id);
         }
     }
 }
