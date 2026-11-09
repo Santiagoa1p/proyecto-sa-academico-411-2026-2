@@ -92,6 +92,46 @@ class ServiciosAcademicosTest {
         assertTrue(inscripciones.guardado);
     }
 
+    @Test
+    void inscripcionRechazaEstudianteYaInscritoEnElGrupo() {
+        InscripcionDaoFake inscripciones = new InscripcionDaoFake();
+        inscripciones.duplicada = true;
+        InscripcionCursoService servicio = new InscripcionCursoService(
+                inscripciones, new EstudianteDaoFake(true), new GrupoDaoFake(true));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> servicio.registrarInscripcion(new InscripcionCurso(0, 1, 1, null, "ACTIVO")));
+        assertFalse(inscripciones.guardado);
+    }
+
+    @Test
+    void actualizarInscripcionExcluyeElRegistroActualAlVerificarDuplicados() {
+        InscripcionDaoFake inscripciones = new InscripcionDaoFake();
+        inscripciones.existente = true;
+        inscripciones.duplicada = true;
+        inscripciones.idInscripcionDuplicada = 1;
+        InscripcionCursoService servicio = new InscripcionCursoService(
+                inscripciones, new EstudianteDaoFake(true), new GrupoDaoFake(true));
+
+        servicio.actualizarInscripcion(new InscripcionCurso(1, 1, 1, null, "ACTIVO"));
+
+        assertTrue(inscripciones.actualizada);
+    }
+
+    @Test
+    void actualizarInscripcionRechazaDuplicadoDeOtroRegistro() {
+        InscripcionDaoFake inscripciones = new InscripcionDaoFake();
+        inscripciones.existente = true;
+        inscripciones.duplicada = true;
+        inscripciones.idInscripcionDuplicada = 2;
+        InscripcionCursoService servicio = new InscripcionCursoService(
+                inscripciones, new EstudianteDaoFake(true), new GrupoDaoFake(true));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> servicio.actualizarInscripcion(new InscripcionCurso(1, 1, 1, null, "ACTIVO")));
+        assertFalse(inscripciones.actualizada);
+    }
+
     private static class EstudianteDaoFake extends EstudianteDao {
         private final boolean existente;
         private boolean guardado;
@@ -161,10 +201,31 @@ class ServiciosAcademicosTest {
 
     private static class InscripcionDaoFake extends InscripcionCursoDao {
         private boolean guardado;
+        private boolean actualizada;
+        private boolean existente;
+        private boolean duplicada;
+        private int idInscripcionDuplicada = 1;
 
         @Override
         public void guardar(InscripcionCurso inscripcion) {
             guardado = true;
+        }
+
+        @Override
+        public Optional<InscripcionCurso> buscarPorId(int id) {
+            return existente
+                    ? Optional.of(new InscripcionCurso(id, 1, 1, null, "ACTIVO"))
+                    : Optional.empty();
+        }
+
+        @Override
+        public boolean existeParaEstudianteYGrupo(int idEstudiante, int idGrupo, int idInscripcionExcluida) {
+            return duplicada && idInscripcionExcluida != idInscripcionDuplicada;
+        }
+
+        @Override
+        public void actualizar(InscripcionCurso inscripcion) {
+            actualizada = true;
         }
     }
 }

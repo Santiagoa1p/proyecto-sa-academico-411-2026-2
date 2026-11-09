@@ -64,6 +64,22 @@ public class InscripcionCursoDao {
         }
     }
 
+    public boolean existeParaEstudianteYGrupo(int idEstudiante, int idGrupo, int idInscripcionExcluida) {
+        String sql = "SELECT 1 FROM " + TABLE
+                + " WHERE id_estudiante = ? AND id_grupo = ? AND id <> ?";
+        try (Connection connection = ConexionDatabase.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, idEstudiante);
+            statement.setInt(2, idGrupo);
+            statement.setInt(3, idInscripcionExcluida);
+            try (ResultSet results = statement.executeQuery()) {
+                return results.next();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("No se pudo verificar la inscripción existente.", e);
+        }
+    }
+
     public void actualizar(InscripcionCurso inscripcion) {
         String sql = "UPDATE " + TABLE + " SET id_estudiante = ?, id_grupo = ?, final_grade = ?, status = ? WHERE id = ?";
         try (Connection connection = ConexionDatabase.getConnection();

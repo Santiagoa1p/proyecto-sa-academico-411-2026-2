@@ -26,7 +26,7 @@ public class InscripcionCursoService {
     }
 
     public void registrarInscripcion(InscripcionCurso inscripcion) {
-        validar(inscripcion);
+        validar(inscripcion, 0);
         inscripcionDao.guardar(inscripcion);
     }
 
@@ -40,8 +40,11 @@ public class InscripcionCursoService {
     }
 
     public void actualizarInscripcion(InscripcionCurso inscripcion) {
-        validar(inscripcion);
+        if (inscripcion == null) {
+            throw new IllegalArgumentException("La inscripción es obligatoria.");
+        }
         Validaciones.idPositivo(inscripcion.getIdInscripcion(), "inscripción");
+        validar(inscripcion, inscripcion.getIdInscripcion());
         exigirInscripcionExistente(inscripcion.getIdInscripcion());
         inscripcionDao.actualizar(inscripcion);
     }
@@ -58,7 +61,7 @@ public class InscripcionCursoService {
         }
     }
 
-    private void validar(InscripcionCurso inscripcion) {
+    private void validar(InscripcionCurso inscripcion, int idInscripcionExcluida) {
         if (inscripcion == null) {
             throw new IllegalArgumentException("La inscripción es obligatoria.");
         }
@@ -69,6 +72,10 @@ public class InscripcionCursoService {
         }
         if (grupoDao.buscarPorId(inscripcion.getIdGrupo()).isEmpty()) {
             throw new IllegalArgumentException("No existe el grupo indicado.");
+        }
+        if (inscripcionDao.existeParaEstudianteYGrupo(
+                inscripcion.getIdEstudiante(), inscripcion.getIdGrupo(), idInscripcionExcluida)) {
+            throw new IllegalArgumentException("El estudiante ya está inscrito en este grupo.");
         }
         Float nota = inscripcion.getNotaFinal();
         if (nota != null && (!Float.isFinite(nota) || nota < 0 || nota > 5)) {
