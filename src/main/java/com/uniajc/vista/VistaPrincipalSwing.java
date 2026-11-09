@@ -236,7 +236,7 @@ public class VistaPrincipalSwing extends JFrame {
             agregarBoton(botones, "Eliminar", this::eliminar);
             agregarBoton(botones, "Actualizar lista", this::cargar);
             add(botones, BorderLayout.SOUTH);
-            SwingUtilities.invokeLater(this::cargar);
+            SwingUtilities.invokeLater(() -> ejecutar(this::cargar));
         }
 
         private void agregarBoton(JPanel panel, String texto, Runnable accion) {
