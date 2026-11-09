@@ -49,8 +49,8 @@ classDiagram
 
 ## Instrucciones para el Estudiante:
 1.  **Crea tu propia rama:** `feature/practica-[TuNombre]`.
-2.  **Entidad:** Crea las clases en el paquete `com.uniajc.modelo` para las entidades restantes.
-3.  **DAO:** Implementa la persistencia en `com.uniajc.modelo` usando JDBC y `ConexionDatabase`.
+2.  **Entidad:** Crea las clases en el paquete `com.uniajc.modelo` para las entidades del ecosistema.
+3.  **DAO:** Implementa la persistencia en `com.uniajc.dao` usando JDBC y `ConexionDatabase`.
 4.  **Servicio:** Agrega la lógica de negocio (validaciones de integridad).
 5.  **Vistas:** Implementa interfaces tanto para Scanner como para Swing.
 6.  **Pruebas:** Asegúrate de que tu código pase los tests de validación del docente.
