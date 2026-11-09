@@ -16,7 +16,9 @@ import com.uniajc.servicios.GrupoService;
 import com.uniajc.servicios.InscripcionCursoService;
 import com.uniajc.servicios.MateriaService;
 import com.uniajc.vista.VistaConsola;
+import com.uniajc.vista.VistaPrincipalSwing;
 
+import javax.swing.SwingUtilities;
 import java.util.Scanner;
 
 public class Main {
@@ -33,6 +35,12 @@ public class Main {
         ControladorGrupo grupos = new ControladorGrupo(new GrupoService(grupoDao, materiaDao, docenteDao));
         ControladorInscripcionCurso inscripciones = new ControladorInscripcionCurso(
                 new InscripcionCursoService(inscripcionDao, estudianteDao, grupoDao));
+
+        if (args.length > 0 && "--swing".equalsIgnoreCase(args[0])) {
+            SwingUtilities.invokeLater(() ->
+                    new VistaPrincipalSwing(estudiantes, docentes, materias, grupos, inscripciones).setVisible(true));
+            return;
+        }
 
         VistaConsola vista = new VistaConsola(
                 new Scanner(System.in), estudiantes, docentes, materias, grupos, inscripciones);

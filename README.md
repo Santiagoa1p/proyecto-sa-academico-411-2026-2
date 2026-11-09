@@ -59,6 +59,11 @@ classDiagram
 ## Configuración de BD:
 El proyecto utiliza PostgreSQL (incluido Neon). Configura `URL`, `USERNAME` y `PASSWORD` en `config.properties` en la raíz del proyecto. Ejecuta una vez el script `src/main/resources/db/schema-postgres.sql` en la base de datos antes de iniciar la aplicación.
 
+## Ejecutar la aplicación
+
+- Consola con `Scanner` (PowerShell): `mvn exec:java '-Dexec.mainClass=com.uniajc.Main'`
+- Interfaz Swing (PowerShell): `mvn exec:java '-Dexec.mainClass=com.uniajc.Main' '-Dexec.args=--swing'`
+
 ---
 *Recuerda: El Modelo nunca debe hablar con el usuario (sin System.out). El Controlador orquesta y la Vista interactúa.*
 
