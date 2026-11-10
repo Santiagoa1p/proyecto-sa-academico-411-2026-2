@@ -72,6 +72,11 @@ public abstract class VistaMenuConsola {
         }
     }
 
+    /** Recorta textos largos para que no descuadren las columnas. */
+    protected static String cortar(String texto, int maximo) {
+        return texto.length() <= maximo ? texto : texto.substring(0, maximo - 1) + "…";
+    }
+
     protected IllegalArgumentException noEncontrado(String entidad, int id) {
         return new IllegalArgumentException("No existe " + entidad + " con ID " + id + ".");
     }

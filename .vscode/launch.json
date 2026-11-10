@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Sistema académico (Swing)",
+      "request": "launch",
+      "mainClass": "com.uniajc.Main",
+      "args": "swing",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "Sistema académico (Consola)",
+      "request": "launch",
+      "mainClass": "com.uniajc.Main",
+      "args": "consola",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}

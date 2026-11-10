@@ -98,6 +98,7 @@ public class VistaInscripcionCurso extends VistaMenuConsola {
                 .map(e -> e.getNombre() + " " + e.getApellido())
                 .orElse("#" + i.getIdEstudiante());
         String nota = i.getNotaFinal() == null ? "-" : String.format("%.2f", i.getNotaFinal());
-        lector.mostrar(String.format(FORMATO, i.getIdInscripcion(), estudiante, i.getIdGrupo(), nota, i.getEstado()));
+        lector.mostrar(String.format(FORMATO, i.getIdInscripcion(), cortar(estudiante, 30), i.getIdGrupo(),
+                nota, i.getEstado()));
     }
 }

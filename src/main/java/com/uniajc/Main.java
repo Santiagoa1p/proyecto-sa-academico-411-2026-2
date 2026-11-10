@@ -5,6 +5,9 @@ import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import com.uniajc.controlador.ControladorDocente;
 import com.uniajc.controlador.ControladorEstudiante;
 import com.uniajc.controlador.ControladorGrupo;
@@ -23,13 +26,18 @@ import com.uniajc.servicios.InscripcionCursoService;
 import com.uniajc.servicios.MateriaService;
 import com.uniajc.vista.LectorConsola;
 import com.uniajc.vista.VistaConsola;
+import com.uniajc.vista.VistaPrincipalSwing;
 
 /**
  * Punto de entrada. Arma las capas (DAO -> Servicio -> Controlador) y abre
- * la vista de consola.
+ * la vista de consola o la ventana Swing.
  */
 public class Main {
 
+    /**
+     * Uso: sin argumentos pregunta qué interfaz abrir; con "swing" abre la
+     * ventana gráfica y con "consola" el menú de texto.
+     */
     public static void main(String[] args) {
         Runtime.getRuntime().addShutdownHook(new Thread(ConexionDatabase::closeConnection));
 
@@ -37,10 +45,42 @@ public class Main {
         Scanner scanner = new Scanner(System.in, charsetConsola());
         LectorConsola lector = new LectorConsola(scanner, System.out);
 
+        String modo = args.length > 0 ? args[0].replace("-", "").toLowerCase() : elegirModo(lector);
+        if (modo.equals("swing") || modo.equals("2")) {
+            iniciarSwing(c);
+            return;
+        }
         if (!probarConexion(lector)) {
             return;
         }
         new VistaConsola(lector, c.estudiantes, c.docentes, c.materias, c.grupos, c.inscripciones).iniciar();
+    }
+
+    private static String elegirModo(LectorConsola lector) {
+        lector.mostrar("¿Qué interfaz deseas usar?");
+        lector.mostrar("1. Consola");
+        lector.mostrar("2. Ventana (Swing)");
+        try {
+            return lector.leerTexto("Opción");
+        } catch (LectorConsola.FinDeEntrada fin) {
+            return "swing";
+        }
+    }
+
+    private static void iniciarSwing(Controladores c) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                ConexionDatabase.getConnection();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null,
+                        e.getMessage() + "\n\nRevisa config.properties (URL, USERNAME, PASSWORD)"
+                                + " y que hayas ejecutado schema.sql en la base de datos.",
+                        "No se pudo conectar", JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
+            }
+            new VistaPrincipalSwing(c.estudiantes, c.docentes, c.materias, c.grupos, c.inscripciones)
+                    .setVisible(true);
+        });
     }
 
     /** Une todas las capas compartiendo las mismas instancias de DAO. */

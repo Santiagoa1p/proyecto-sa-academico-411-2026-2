@@ -90,6 +90,7 @@ public class VistaGrupo extends VistaMenuConsola {
     private void imprimir(Grupo g) {
         String materia = materias.buscar(g.getIdMateria()).map(Materia::getNombreMateria).orElse("#" + g.getIdMateria());
         String docente = docentes.buscar(g.getIdDocente()).map(Docente::getNombre).orElse("#" + g.getIdDocente());
-        lector.mostrar(String.format(FORMATO, g.getIdGrupo(), materia, docente, g.getAula(), g.getHorario()));
+        lector.mostrar(String.format(FORMATO, g.getIdGrupo(), cortar(materia, 30), cortar(docente, 25),
+                g.getAula(), g.getHorario()));
     }
 }
