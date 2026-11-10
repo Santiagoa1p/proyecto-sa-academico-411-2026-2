@@ -24,7 +24,6 @@ public class DocenteService {
 
     public void registrarDocente(Docente docente) {
         validarDocente(docente);
-        validarEmailDisponible(docente.getEmail(), 0);
         docenteDao.guardar(docente);
     }
 
@@ -41,7 +40,6 @@ public class DocenteService {
         Validaciones.obligatorio(docente, "El docente");
         exigirExistente(docente.getIdDocente());
         validarDocente(docente);
-        validarEmailDisponible(docente.getEmail(), docente.getIdDocente());
         docenteDao.actualizar(docente);
     }
 
@@ -65,18 +63,8 @@ public class DocenteService {
         Validaciones.obligatorio(docente, "El docente");
         docente.setNombre(Validaciones.limpiar(docente.getNombre()));
         docente.setEspecialidad(Validaciones.limpiar(docente.getEspecialidad()));
-        docente.setEmail(Validaciones.limpiar(docente.getEmail()).toLowerCase());
 
         Validaciones.nombrePropio(docente.getNombre(), "El nombre");
         Validaciones.texto(docente.getEspecialidad(), "La especialidad", 2, 100);
-        Validaciones.email(docente.getEmail());
-    }
-
-    private void validarEmailDisponible(String email, int idPropio) {
-        docenteDao.buscarPorEmail(email)
-                .filter(otro -> otro.getIdDocente() != idPropio)
-                .ifPresent(otro -> {
-                    throw new IllegalArgumentException("Ya existe un docente con el email " + email + ".");
-                });
     }
 }

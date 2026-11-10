@@ -48,7 +48,7 @@ public class LectorConsola {
 
     /** Muestra el valor actual; si el usuario pulsa Enter se conserva. */
     public String leerTexto(String etiqueta, String actual) {
-        String texto = leerTexto(etiqueta + " [" + actual + "]");
+        String texto = leerTexto(etiqueta + " [" + (actual == null ? "" : actual) + "]");
         return texto.isEmpty() ? actual : texto;
     }
 

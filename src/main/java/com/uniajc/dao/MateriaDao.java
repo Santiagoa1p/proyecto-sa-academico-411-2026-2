@@ -14,10 +14,10 @@ import com.uniajc.modelo.Materia;
 /** Acceso a la tabla "practica-mvc".materias. */
 public class MateriaDao {
 
-    private static final String SELECT = "SELECT id, name, credits FROM \"practica-mvc\".materias";
+    private static final String SELECT = "SELECT id_materia, nombre_materia, creditos FROM \"practica-mvc\".materias";
 
     public void guardar(Materia materia) {
-        String sql = "INSERT INTO \"practica-mvc\".materias (name, credits) VALUES (?, ?)";
+        String sql = "INSERT INTO \"practica-mvc\".materias (nombre_materia, creditos) VALUES (?, ?)";
         try (PreparedStatement pstmt = ConexionDatabase.getConnection()
                 .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, materia.getNombreMateria());
@@ -35,7 +35,7 @@ public class MateriaDao {
 
     public List<Materia> obtenerTodos() {
         List<Materia> lista = new ArrayList<>();
-        try (PreparedStatement pstmt = ConexionDatabase.getConnection().prepareStatement(SELECT + " ORDER BY id");
+        try (PreparedStatement pstmt = ConexionDatabase.getConnection().prepareStatement(SELECT + " ORDER BY id_materia");
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 lista.add(mapearMateria(rs));
@@ -47,7 +47,7 @@ public class MateriaDao {
     }
 
     public Optional<Materia> buscarPorId(int id) {
-        try (PreparedStatement pstmt = ConexionDatabase.getConnection().prepareStatement(SELECT + " WHERE id = ?")) {
+        try (PreparedStatement pstmt = ConexionDatabase.getConnection().prepareStatement(SELECT + " WHERE id_materia = ?")) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next() ? Optional.of(mapearMateria(rs)) : Optional.empty();
@@ -59,7 +59,7 @@ public class MateriaDao {
 
     public Optional<Materia> buscarPorNombre(String nombre) {
         try (PreparedStatement pstmt = ConexionDatabase.getConnection()
-                .prepareStatement(SELECT + " WHERE LOWER(name) = LOWER(?)")) {
+                .prepareStatement(SELECT + " WHERE LOWER(nombre_materia) = LOWER(?)")) {
             pstmt.setString(1, nombre);
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next() ? Optional.of(mapearMateria(rs)) : Optional.empty();
@@ -70,7 +70,7 @@ public class MateriaDao {
     }
 
     public void actualizar(Materia materia) {
-        String sql = "UPDATE \"practica-mvc\".materias SET name = ?, credits = ? WHERE id = ?";
+        String sql = "UPDATE \"practica-mvc\".materias SET nombre_materia = ?, creditos = ? WHERE id_materia = ?";
         try (PreparedStatement pstmt = ConexionDatabase.getConnection().prepareStatement(sql)) {
             pstmt.setString(1, materia.getNombreMateria());
             pstmt.setInt(2, materia.getCreditos());
@@ -85,7 +85,7 @@ public class MateriaDao {
 
     public void eliminar(int id) {
         try (PreparedStatement pstmt = ConexionDatabase.getConnection()
-                .prepareStatement("DELETE FROM \"practica-mvc\".materias WHERE id = ?")) {
+                .prepareStatement("DELETE FROM \"practica-mvc\".materias WHERE id_materia = ?")) {
             pstmt.setInt(1, id);
             if (pstmt.executeUpdate() == 0) {
                 throw new IllegalArgumentException("Materia no encontrada con ID: " + id);
@@ -96,6 +96,6 @@ public class MateriaDao {
     }
 
     private Materia mapearMateria(ResultSet rs) throws SQLException {
-        return new Materia(rs.getInt("id"), rs.getString("name"), rs.getInt("credits"));
+        return new Materia(rs.getInt("id_materia"), rs.getString("nombre_materia"), rs.getInt("creditos"));
     }
 }

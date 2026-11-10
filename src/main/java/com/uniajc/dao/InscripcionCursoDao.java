@@ -1,6 +1,5 @@
 package com.uniajc.dao;
 
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,10 +16,10 @@ import com.uniajc.modelo.InscripcionCurso;
 public class InscripcionCursoDao {
 
     private static final String SELECT =
-            "SELECT id, id_estudiante, id_grupo, final_grade, status FROM \"practica-mvc\".inscripciones";
+            "SELECT id_inscripcion, id_estudiante, id_grupo, nota_final, estado FROM \"practica-mvc\".inscripciones";
 
     public void guardar(InscripcionCurso inscripcion) {
-        String sql = "INSERT INTO \"practica-mvc\".inscripciones (id_estudiante, id_grupo, final_grade, status) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO \"practica-mvc\".inscripciones (id_estudiante, id_grupo, nota_final, estado) VALUES (?, ?, ?, ?)";
         try (PreparedStatement pstmt = ConexionDatabase.getConnection()
                 .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, inscripcion.getIdEstudiante());
@@ -40,7 +39,7 @@ public class InscripcionCursoDao {
 
     public List<InscripcionCurso> obtenerTodos() {
         List<InscripcionCurso> lista = new ArrayList<>();
-        try (PreparedStatement pstmt = ConexionDatabase.getConnection().prepareStatement(SELECT + " ORDER BY id");
+        try (PreparedStatement pstmt = ConexionDatabase.getConnection().prepareStatement(SELECT + " ORDER BY id_inscripcion");
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 lista.add(mapearInscripcion(rs));
@@ -52,7 +51,7 @@ public class InscripcionCursoDao {
     }
 
     public Optional<InscripcionCurso> buscarPorId(int id) {
-        try (PreparedStatement pstmt = ConexionDatabase.getConnection().prepareStatement(SELECT + " WHERE id = ?")) {
+        try (PreparedStatement pstmt = ConexionDatabase.getConnection().prepareStatement(SELECT + " WHERE id_inscripcion = ?")) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next() ? Optional.of(mapearInscripcion(rs)) : Optional.empty();
@@ -85,7 +84,7 @@ public class InscripcionCursoDao {
     }
 
     public void actualizar(InscripcionCurso inscripcion) {
-        String sql = "UPDATE \"practica-mvc\".inscripciones SET id_estudiante = ?, id_grupo = ?, final_grade = ?, status = ? WHERE id = ?";
+        String sql = "UPDATE \"practica-mvc\".inscripciones SET id_estudiante = ?, id_grupo = ?, nota_final = ?, estado = ? WHERE id_inscripcion = ?";
         try (PreparedStatement pstmt = ConexionDatabase.getConnection().prepareStatement(sql)) {
             pstmt.setInt(1, inscripcion.getIdEstudiante());
             pstmt.setInt(2, inscripcion.getIdGrupo());
@@ -102,7 +101,7 @@ public class InscripcionCursoDao {
 
     public void eliminar(int id) {
         try (PreparedStatement pstmt = ConexionDatabase.getConnection()
-                .prepareStatement("DELETE FROM \"practica-mvc\".inscripciones WHERE id = ?")) {
+                .prepareStatement("DELETE FROM \"practica-mvc\".inscripciones WHERE id_inscripcion = ?")) {
             pstmt.setInt(1, id);
             if (pstmt.executeUpdate() == 0) {
                 throw new IllegalArgumentException("Inscripción no encontrada con ID: " + id);
@@ -124,18 +123,22 @@ public class InscripcionCursoDao {
         }
     }
 
-    /** La nota es DECIMAL(5,2) en la BD; se envía como BigDecimal para no perder precisión. */
+    /**
+     * La nota es double precision en la BD. Se convierte desde el texto del
+     * float para que 4.2f se guarde como 4.2 y no como 4.199999809.
+     */
     private void asignarNota(PreparedStatement pstmt, int indice, Float nota) throws SQLException {
         if (nota == null) {
-            pstmt.setNull(indice, Types.DECIMAL);
+            pstmt.setNull(indice, Types.DOUBLE);
         } else {
-            pstmt.setBigDecimal(indice, new BigDecimal(Float.toString(nota)));
+            pstmt.setDouble(indice, Double.parseDouble(Float.toString(nota)));
         }
     }
 
     private InscripcionCurso mapearInscripcion(ResultSet rs) throws SQLException {
-        BigDecimal nota = rs.getBigDecimal("final_grade");
-        return new InscripcionCurso(rs.getInt("id"), rs.getInt("id_estudiante"), rs.getInt("id_grupo"),
-                nota == null ? null : nota.floatValue(), rs.getString("status"));
+        double nota = rs.getDouble("nota_final");
+        Float notaFinal = rs.wasNull() ? null : (float) nota;
+        return new InscripcionCurso(rs.getInt("id_inscripcion"), rs.getInt("id_estudiante"), rs.getInt("id_grupo"),
+                notaFinal, rs.getString("estado"));
     }
 }

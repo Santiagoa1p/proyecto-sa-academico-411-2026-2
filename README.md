@@ -58,15 +58,24 @@ classDiagram
 ## Configuración de BD:
 Usa el archivo `config.properties` en la raíz para configurar tu conexión a MySQL, Postgres (Neon) o SQLite local.
 
-### Paso a paso con Neon + DBeaver
+El proyecto está hecho para la base **compartida del curso** en Neon (esquema `"practica-mvc"`), cuyas tablas usan las columnas del diagrama: `docentes(id_docente, nombre, especialidad)`, `materias(id_materia, nombre_materia, creditos)`, `grupos(id_grupo, id_materia, id_docente, aula, horario)`, `inscripciones(id_inscripcion, id_estudiante, id_grupo, nota_final, estado)` y `estudiantes(id, name, lastname, email)`.
 
-1. **Crear la base en Neon:** entra a [neon.tech](https://neon.tech), inicia sesión y pulsa **New Project** (cualquier nombre, región AWS us-east).
-2. **Copiar la conexión:** en el panel del proyecto pulsa **Connect** y copia el *connection string*. Se ve así:
-   `postgresql://neondb_owner:CLAVE@ep-xxxx.us-east-2.aws.neon.tech/neondb?sslmode=require`
-3. **Configurar el proyecto:** copia `config.example.properties` como `config.properties` (en la raíz) y pega ese texto en `URL`. Puedes dejar `USERNAME` y `PASSWORD` vacíos: se toman de la URL. También acepta el formato JDBC clásico (`jdbc:postgresql://...` + usuario y clave aparte). `config.properties` está en `.gitignore`, así que tu clave no se sube a GitHub.
-4. **Crear las tablas desde DBeaver:** *Nueva conexión → PostgreSQL*, con el host, la base (`neondb`), el usuario y la clave de Neon. En la pestaña **SSL** activa *Usar SSL* con modo `require`. Abre un editor SQL y ejecuta completo (**Alt+X**):
-   - `src/main/resources/db/schema.sql` → crea el esquema `"practica-mvc"` y las 5 tablas.
-   - `src/main/resources/db/datos-prueba.sql` → (opcional) datos de ejemplo.
+`config.properties` (en la raíz, ignorado por Git) acepta la URL en formato JDBC o tal como la copia Neon:
+
+```properties
+URL=jdbc:postgresql://HOST-DE-NEON/neondb?sslmode=require
+USERNAME=neondb_owner
+PASSWORD=la_clave
+```
+
+> La `URL` debe llevar el prefijo `jdbc:postgresql://`, el nombre de la base (`/neondb`) y `?sslmode=require`; solo el host no basta. Ver `config.example.properties`.
+
+### Opción A: base compartida del profesor
+Pon en `config.properties` el host, usuario y clave que dio el profesor. Las tablas ya existen: **no ejecutes los scripts SQL** allí. Para verlas en DBeaver: *Nueva conexión → PostgreSQL*, con Host = el host de Neon, Database = `neondb`, y el usuario y la clave; en la pestaña **SSL**, activa SSL en modo `require`. Luego abre `neondb → Esquemas → practica-mvc → Tablas`.
+
+### Opción B: tu propia base en Neon
+1. En [neon.tech](https://neon.tech) pulsa **New Project**, luego **Connect**, y copia el *connection string* (`postgresql://usuario:clave@host/neondb?sslmode=require`). Puedes pegarlo tal cual en `URL` y dejar `USERNAME` y `PASSWORD` vacíos.
+2. Conéctate desde DBeaver (igual que en la opción A) y ejecuta con **Alt+X** `src/main/resources/db/schema.sql`, que crea la misma estructura del profesor. Si quieres datos de ejemplo, ejecuta también `datos-prueba.sql`.
 
 > Neon suspende la base tras unos minutos sin uso; la primera consulta después puede tardar un par de segundos. La aplicación se reconecta sola.
 
@@ -99,7 +108,7 @@ Vista (consola / Swing) → Controlador → Servicio (validaciones) → DAO (JDB
 
 ### Reglas de negocio (servicios)
 
-- Nombres y apellidos solo con letras; emails con formato válido y **sin repetir**.
+- Nombres y apellidos solo con letras; emails de estudiantes con formato válido y **sin repetir**.
 - Materias con nombre único y **1 a 10 créditos**.
 - Un grupo exige materia y docente existentes; ni el **docente** ni el **aula** pueden repetirse en el mismo horario.
 - Un estudiante no puede inscribirse **dos veces en el mismo grupo**.

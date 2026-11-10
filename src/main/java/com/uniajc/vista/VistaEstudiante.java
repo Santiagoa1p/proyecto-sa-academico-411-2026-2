@@ -1,6 +1,7 @@
 package com.uniajc.vista;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.uniajc.controlador.ControladorEstudiante;
 import com.uniajc.modelo.Estudiante;
@@ -64,6 +65,7 @@ public class VistaEstudiante extends VistaMenuConsola {
     }
 
     private void imprimir(Estudiante e) {
-        lector.mostrar(String.format(FORMATO, e.getIdEstudiante(), e.getNombre(), e.getApellido(), e.getEmail()));
+        lector.mostrar(String.format(FORMATO, e.getIdEstudiante(), e.getNombre(),
+                Objects.toString(e.getApellido(), ""), Objects.toString(e.getEmail(), "")));
     }
 }

@@ -58,9 +58,6 @@ public final class DaosEnMemoria {
         @Override public void guardar(Docente d) { d.setIdDocente(siguiente++); datos.put(d.getIdDocente(), d); }
         @Override public List<Docente> obtenerTodos() { return new ArrayList<>(datos.values()); }
         @Override public Optional<Docente> buscarPorId(int id) { return Optional.ofNullable(datos.get(id)); }
-        @Override public Optional<Docente> buscarPorEmail(String email) {
-            return datos.values().stream().filter(d -> d.getEmail().equalsIgnoreCase(email)).findFirst();
-        }
         @Override public void actualizar(Docente d) { datos.put(d.getIdDocente(), d); }
         @Override public void eliminar(int id) { datos.remove(id); }
     }

@@ -28,4 +28,9 @@ public class Estudiante {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    /** Nombre y apellido juntos; tolera apellidos vacíos de registros antiguos. */
+    public String getNombreCompleto() {
+        return apellido == null || apellido.isBlank() ? nombre : nombre + " " + apellido;
+    }
 }

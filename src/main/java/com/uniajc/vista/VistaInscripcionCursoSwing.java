@@ -56,7 +56,7 @@ public class VistaInscripcionCursoSwing extends VistaCrudSwing<InscripcionCurso>
     protected void antesDeCargar() {
         nombresEstudiantes.clear();
         estudiantes.listar().forEach(e ->
-                nombresEstudiantes.put(e.getIdEstudiante(), e.getNombre() + " " + e.getApellido()));
+                nombresEstudiantes.put(e.getIdEstudiante(), e.getNombreCompleto()));
         nombresGrupos.clear();
         opcionesGrupo().forEach(o -> nombresGrupos.put(o.id(), o.texto()));
     }
@@ -74,7 +74,7 @@ public class VistaInscripcionCursoSwing extends VistaCrudSwing<InscripcionCurso>
     @Override
     protected void construirFormulario(Formulario f, InscripcionCurso actual) {
         List<Opcion> opcionesEstudiante = estudiantes.listar().stream()
-                .map(e -> new Opcion(e.getIdEstudiante(), e.getNombre() + " " + e.getApellido() + " (" + e.getEmail() + ")"))
+                .map(e -> new Opcion(e.getIdEstudiante(), e.getNombreCompleto() + (e.getEmail() == null ? "" : " (" + e.getEmail() + ")")))
                 .toList();
         List<Opcion> opcionesGrupo = opcionesGrupo();
 

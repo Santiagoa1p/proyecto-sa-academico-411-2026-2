@@ -78,7 +78,7 @@ class VistaConsolaTest {
     void registraGrupoEInscripcionConNota() {
         String salida = ejecutar(
                 "1", "2", "Ana", "Pérez", "ana@uniajc.edu.co", "0",
-                "2", "2", "Carlos Gómez", "Software", "carlos@uniajc.edu.co", "0",
+                "2", "2", "Carlos Gómez", "Software", "0",
                 "3", "2", "POO", "3", "0",
                 "4", "2", "1", "1", "A-201", "Lunes 18:00", "0",
                 "5", "2", "1", "1", "4,5", "aprobado", "1", "0",

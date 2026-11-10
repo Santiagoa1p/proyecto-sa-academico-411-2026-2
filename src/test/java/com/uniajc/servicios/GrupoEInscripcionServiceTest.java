@@ -26,8 +26,8 @@ class GrupoEInscripcionServiceTest {
         inscripciones = daos.inscripcionService();
 
         daos.materias.guardar(new Materia(0, "POO", 3));                                 // materia 1
-        daos.docentes.guardar(new Docente(0, "Carlos", "Software", "carlos@uniajc.edu.co")); // docente 1
-        daos.docentes.guardar(new Docente(0, "María", "Datos", "maria@uniajc.edu.co"));     // docente 2
+        daos.docentes.guardar(new Docente(0, "Carlos", "Software")); // docente 1
+        daos.docentes.guardar(new Docente(0, "María", "Datos"));     // docente 2
         daos.estudiantes.guardar(new Estudiante(0, "Ana", "Pérez", "ana@uniajc.edu.co"));   // estudiante 1
     }
 

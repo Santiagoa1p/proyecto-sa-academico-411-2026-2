@@ -14,10 +14,9 @@ public class VistaDocenteSwing extends VistaCrudSwing<Docente> {
     private final ControladorDocente controlador;
     private JTextField campoNombre;
     private JTextField campoEspecialidad;
-    private JTextField campoEmail;
 
     public VistaDocenteSwing(ControladorDocente controlador) {
-        super("Docentes", "docente", new String[]{"ID", "Nombre", "Especialidad", "Email"});
+        super("Docentes", "docente", new String[]{"ID", "Nombre", "Especialidad"});
         this.controlador = controlador;
     }
 
@@ -30,20 +29,18 @@ public class VistaDocenteSwing extends VistaCrudSwing<Docente> {
 
     @Override
     protected Object[] fila(Docente d) {
-        return new Object[]{d.getIdDocente(), d.getNombre(), d.getEspecialidad(), d.getEmail()};
+        return new Object[]{d.getIdDocente(), d.getNombre(), d.getEspecialidad()};
     }
 
     @Override
     protected void construirFormulario(Formulario f, Docente actual) {
         campoNombre = f.texto("Nombre completo", actual == null ? "" : actual.getNombre());
         campoEspecialidad = f.texto("Especialidad", actual == null ? "" : actual.getEspecialidad());
-        campoEmail = f.texto("Email", actual == null ? "" : actual.getEmail());
     }
 
     @Override
     protected void leerFormulario(Docente destino) {
         destino.setNombre(campoNombre.getText());
         destino.setEspecialidad(campoEspecialidad.getText());
-        destino.setEmail(campoEmail.getText());
     }
 }

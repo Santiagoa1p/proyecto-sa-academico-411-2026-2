@@ -85,7 +85,7 @@ public class VistaInscripcionCurso extends VistaMenuConsola {
     private void mostrarOpciones() {
         lector.mostrar("Estudiantes:");
         for (Estudiante e : estudiantes.listar()) {
-            lector.mostrar("  " + e.getIdEstudiante() + " - " + e.getNombre() + " " + e.getApellido());
+            lector.mostrar("  " + e.getIdEstudiante() + " - " + e.getNombreCompleto());
         }
         lector.mostrar("Grupos:");
         for (Grupo g : grupos.listar()) {
@@ -95,7 +95,7 @@ public class VistaInscripcionCurso extends VistaMenuConsola {
 
     private void imprimir(InscripcionCurso i) {
         String estudiante = estudiantes.buscar(i.getIdEstudiante())
-                .map(e -> e.getNombre() + " " + e.getApellido())
+                .map(Estudiante::getNombreCompleto)
                 .orElse("#" + i.getIdEstudiante());
         String nota = i.getNotaFinal() == null ? "-" : String.format("%.2f", i.getNotaFinal());
         lector.mostrar(String.format(FORMATO, i.getIdInscripcion(), cortar(estudiante, 30), i.getIdGrupo(),
