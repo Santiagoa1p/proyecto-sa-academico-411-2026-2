@@ -21,24 +21,24 @@ import com.uniajc.modelo.Materia;
  * DAOs falsos que guardan los datos en memoria, para probar los servicios
  * sin conectarse a la base de datos.
  */
-final class DaosEnMemoria {
+public final class DaosEnMemoria {
 
-    final EstudianteFalso estudiantes = new EstudianteFalso();
-    final DocenteFalso docentes = new DocenteFalso();
-    final MateriaFalsa materias = new MateriaFalsa();
-    final GrupoFalso grupos = new GrupoFalso();
-    final InscripcionFalsa inscripciones = new InscripcionFalsa();
+    public final EstudianteFalso estudiantes = new EstudianteFalso();
+    public final DocenteFalso docentes = new DocenteFalso();
+    public final MateriaFalsa materias = new MateriaFalsa();
+    public final GrupoFalso grupos = new GrupoFalso();
+    public final InscripcionFalsa inscripciones = new InscripcionFalsa();
 
-    EstudianteService estudianteService() { return new EstudianteService(estudiantes, inscripciones); }
-    DocenteService docenteService() { return new DocenteService(docentes, grupos); }
-    MateriaService materiaService() { return new MateriaService(materias, grupos); }
-    GrupoService grupoService() { return new GrupoService(grupos, materias, docentes, inscripciones); }
-    InscripcionCursoService inscripcionService() {
+    public EstudianteService estudianteService() { return new EstudianteService(estudiantes, inscripciones); }
+    public DocenteService docenteService() { return new DocenteService(docentes, grupos); }
+    public MateriaService materiaService() { return new MateriaService(materias, grupos); }
+    public GrupoService grupoService() { return new GrupoService(grupos, materias, docentes, inscripciones); }
+    public InscripcionCursoService inscripcionService() {
         return new InscripcionCursoService(inscripciones, estudiantes, grupos);
     }
 
-    static final class EstudianteFalso extends EstudianteDao {
-        final Map<Integer, Estudiante> datos = new LinkedHashMap<>();
+    public static final class EstudianteFalso extends EstudianteDao {
+        public final Map<Integer, Estudiante> datos = new LinkedHashMap<>();
         private int siguiente = 1;
 
         @Override public void guardar(Estudiante e) { e.setIdEstudiante(siguiente++); datos.put(e.getIdEstudiante(), e); }
@@ -51,8 +51,8 @@ final class DaosEnMemoria {
         @Override public void eliminar(int id) { datos.remove(id); }
     }
 
-    static final class DocenteFalso extends DocenteDao {
-        final Map<Integer, Docente> datos = new LinkedHashMap<>();
+    public static final class DocenteFalso extends DocenteDao {
+        public final Map<Integer, Docente> datos = new LinkedHashMap<>();
         private int siguiente = 1;
 
         @Override public void guardar(Docente d) { d.setIdDocente(siguiente++); datos.put(d.getIdDocente(), d); }
@@ -65,8 +65,8 @@ final class DaosEnMemoria {
         @Override public void eliminar(int id) { datos.remove(id); }
     }
 
-    static final class MateriaFalsa extends MateriaDao {
-        final Map<Integer, Materia> datos = new LinkedHashMap<>();
+    public static final class MateriaFalsa extends MateriaDao {
+        public final Map<Integer, Materia> datos = new LinkedHashMap<>();
         private int siguiente = 1;
 
         @Override public void guardar(Materia m) { m.setIdMateria(siguiente++); datos.put(m.getIdMateria(), m); }
@@ -79,8 +79,8 @@ final class DaosEnMemoria {
         @Override public void eliminar(int id) { datos.remove(id); }
     }
 
-    static final class GrupoFalso extends GrupoDao {
-        final Map<Integer, Grupo> datos = new LinkedHashMap<>();
+    public static final class GrupoFalso extends GrupoDao {
+        public final Map<Integer, Grupo> datos = new LinkedHashMap<>();
         private int siguiente = 1;
 
         @Override public void guardar(Grupo g) { g.setIdGrupo(siguiente++); datos.put(g.getIdGrupo(), g); }
@@ -96,8 +96,8 @@ final class DaosEnMemoria {
         @Override public void eliminar(int id) { datos.remove(id); }
     }
 
-    static final class InscripcionFalsa extends InscripcionCursoDao {
-        final Map<Integer, InscripcionCurso> datos = new LinkedHashMap<>();
+    public static final class InscripcionFalsa extends InscripcionCursoDao {
+        public final Map<Integer, InscripcionCurso> datos = new LinkedHashMap<>();
         private int siguiente = 1;
 
         @Override public void guardar(InscripcionCurso i) {
