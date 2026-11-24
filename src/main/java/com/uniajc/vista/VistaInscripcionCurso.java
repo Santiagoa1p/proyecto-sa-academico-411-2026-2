@@ -9,15 +9,32 @@ import com.uniajc.modelo.Estudiante;
 import com.uniajc.modelo.Grupo;
 import com.uniajc.modelo.InscripcionCurso;
 
-/** Vista de consola (Scanner) para inscripciones a cursos. */
+/**
+ * Vista de consola (Scanner) para inscripciones a cursos (capa <b>Vista</b>).
+ *
+ * <p>Hereda de {@link VistaMenuConsola} el menú y el manejo de errores, e implementa
+ * las cinco operaciones CRUD. Solo habla con el usuario (a través de
+ * {@link LectorConsola}) y con su controlador; nunca con el servicio ni con el DAO.</p>
+ *
+ * <p>También recibe los controladores de estudiantes y grupos, para mostrar el nombre
+ * del estudiante en la tabla y listar las opciones al registrar o actualizar.</p>
+ */
 public class VistaInscripcionCurso extends VistaMenuConsola {
 
+    /**
+     * Formato de cada fila para {@code String.format}: {@code %-20s} significa "texto
+     * alineado a la izquierda en 20 espacios", así las columnas quedan derechas.
+     */
     private static final String FORMATO = "%-5s %-30s %-8s %-6s %-10s";
 
     private final ControladorInscripcionCurso controlador;
     private final ControladorEstudiante estudiantes;
     private final ControladorGrupo grupos;
 
+    /**
+     * Crea la vista. {@code super(...)} llama al constructor de {@link VistaMenuConsola}
+     * con el lector y el título del menú.
+     */
     public VistaInscripcionCurso(LectorConsola lector, ControladorInscripcionCurso controlador,
                                  ControladorEstudiante estudiantes, ControladorGrupo grupos) {
         super(lector, "Inscripciones");
@@ -26,6 +43,7 @@ public class VistaInscripcionCurso extends VistaMenuConsola {
         this.grupos = grupos;
     }
 
+    /** Lista todas las inscripciones en forma de tabla, o avisa si no hay ninguna. */
     @Override
     protected void listar() {
         List<InscripcionCurso> inscripciones = controlador.listar();
@@ -37,6 +55,11 @@ public class VistaInscripcionCurso extends VistaMenuConsola {
         inscripciones.forEach(this::imprimir);
     }
 
+    /**
+     * Pide los datos de una inscripción nueva, lo envía al controlador y muestra el ID asignado.
+     * Si algún dato no cumple las reglas, el servicio lanza un error que muestra
+     * {@link VistaMenuConsola}.
+     */
     @Override
     protected void registrar() {
         InscripcionCurso inscripcion = new InscripcionCurso();
@@ -49,6 +72,10 @@ public class VistaInscripcionCurso extends VistaMenuConsola {
         lector.exito("Inscripción registrada con ID " + inscripcion.getIdInscripcion() + ".");
     }
 
+    /**
+     * Pide un ID y muestra ese registro. {@code orElseThrow} lanza el error
+     * "No existe..." si el {@code Optional} viene vacío.
+     */
     @Override
     protected void buscar() {
         int id = lector.leerEntero("ID de la inscripción");
@@ -57,6 +84,10 @@ public class VistaInscripcionCurso extends VistaMenuConsola {
         imprimir(inscripcion);
     }
 
+    /**
+     * Pide un ID, trae el registro actual y deja cambiar cada campo
+     * (Enter conserva el valor que ya tenía).
+     */
     @Override
     protected void actualizar() {
         int id = lector.leerEntero("ID de la inscripción a actualizar");
@@ -71,6 +102,7 @@ public class VistaInscripcionCurso extends VistaMenuConsola {
         lector.exito("Inscripción actualizada.");
     }
 
+    /** Pide un ID y elimina ese registro después de pedir confirmación. */
     @Override
     protected void eliminar() {
         int id = lector.leerEntero("ID de la inscripción a eliminar");
@@ -82,6 +114,10 @@ public class VistaInscripcionCurso extends VistaMenuConsola {
         }
     }
 
+    /**
+     * Muestra los ID disponibles de las entidades relacionadas, para que el usuario
+     * sepa qué número escribir.
+     */
     private void mostrarOpciones() {
         lector.mostrar("Estudiantes:");
         for (Estudiante e : estudiantes.listar()) {
@@ -93,6 +129,7 @@ public class VistaInscripcionCurso extends VistaMenuConsola {
         }
     }
 
+    /** Escribe un registro como una fila de la tabla, con el mismo formato que los títulos. */
     private void imprimir(InscripcionCurso i) {
         String estudiante = estudiantes.buscar(i.getIdEstudiante())
                 .map(Estudiante::getNombreCompleto)

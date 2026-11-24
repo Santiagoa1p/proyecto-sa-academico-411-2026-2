@@ -15,7 +15,13 @@ import com.uniajc.controlador.ControladorMateria;
 import com.uniajc.modelo.Grupo;
 import com.uniajc.modelo.InscripcionCurso;
 
-/** Panel Swing para gestionar inscripciones. Estudiante, grupo y estado se eligen de listas. */
+/**
+ * Panel Swing para gestionar inscripciones. Estudiante, grupo y estado se eligen de listas.
+ *
+ * <p>Hereda de {@link VistaCrudSwing} toda la pantalla (buscador, tabla, botones y
+ * diálogo) y solo define lo propio de esta entidad: las columnas, los campos del
+ * formulario y a qué método del controlador llamar.</p>
+ */
 public class VistaInscripcionCursoSwing extends VistaCrudSwing<InscripcionCurso> {
 
     private static final List<String> ESTADOS = List.of(
@@ -35,6 +41,10 @@ public class VistaInscripcionCursoSwing extends VistaCrudSwing<InscripcionCurso>
     private JTextField campoNota;
     private JComboBox<String> campoEstado;
 
+    /**
+     * Crea el panel. {@code super(...)} le pasa a {@link VistaCrudSwing} el título,
+     * el nombre de la entidad y los encabezados de las columnas.
+     */
     public VistaInscripcionCursoSwing(ControladorInscripcionCurso controlador, ControladorEstudiante estudiantes,
                                       ControladorGrupo grupos, ControladorMateria materias) {
         super("Inscripciones", "inscripción", new String[]{"ID", "Estudiante", "Grupo", "Nota final", "Estado"});
@@ -45,6 +55,7 @@ public class VistaInscripcionCursoSwing extends VistaCrudSwing<InscripcionCurso>
         anchosColumnas(50, 170, 380, 80, 100);
     }
 
+    // Operaciones básicas: cada una solo delega en el controlador (una línea cada una).
     @Override protected List<InscripcionCurso> listar() { return controlador.listar(); }
     @Override protected Optional<InscripcionCurso> buscar(int id) { return controlador.buscar(id); }
     @Override protected InscripcionCurso nuevo() { return new InscripcionCurso(); }
@@ -52,6 +63,11 @@ public class VistaInscripcionCursoSwing extends VistaCrudSwing<InscripcionCurso>
     @Override protected void actualizar(InscripcionCurso i) { controlador.actualizar(i); }
     @Override protected void eliminar(int id) { controlador.eliminar(id); }
 
+    /**
+     * Antes de llenar la tabla, arma diccionarios ({@code Map}) de ID → nombre para
+     * mostrar nombres en vez de números. {@code getOrDefault} en {@link #fila} usa
+     * "#ID" si el registro relacionado ya no existe.
+     */
     @Override
     protected void antesDeCargar() {
         nombresEstudiantes.clear();
@@ -61,6 +77,7 @@ public class VistaInscripcionCursoSwing extends VistaCrudSwing<InscripcionCurso>
         opcionesGrupo().forEach(o -> nombresGrupos.put(o.id(), o.texto()));
     }
 
+    /** Convierte un registro en una fila de la tabla (mismo orden que las columnas). */
     @Override
     protected Object[] fila(InscripcionCurso i) {
         return new Object[]{
@@ -71,6 +88,10 @@ public class VistaInscripcionCursoSwing extends VistaCrudSwing<InscripcionCurso>
                 i.getEstado()};
     }
 
+    /**
+     * Agrega los campos al formulario. Si {@code actual} es {@code null} (registrar),
+     * quedan vacíos; si no (editar), se llenan con los valores actuales.
+     */
     @Override
     protected void construirFormulario(Formulario f, InscripcionCurso actual) {
         List<Opcion> opcionesEstudiante = estudiantes.listar().stream()
@@ -88,6 +109,10 @@ public class VistaInscripcionCursoSwing extends VistaCrudSwing<InscripcionCurso>
         f.nota("Nota de 0.0 a 5.0; déjala vacía si aún no hay.  Se aprueba con 3.0  ");
     }
 
+    /**
+     * Copia lo escrito en el formulario hacia el objeto. Aquí no se valida nada: las
+     * reglas las aplica el servicio cuando el objeto llega a él.
+     */
     @Override
     protected void leerFormulario(InscripcionCurso destino) {
         destino.setIdEstudiante(idElegido(campoEstudiante, "Primero registra al menos un estudiante."));

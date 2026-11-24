@@ -30,17 +30,45 @@ import com.uniajc.controlador.ControladorInscripcionCurso;
 import com.uniajc.controlador.ControladorMateria;
 
 /**
- * Ventana principal. Un menú y una barra lateral cambian entre los paneles
- * de cada entidad, que viven en un CardLayout. Cada panel consulta la base
- * de datos cuando se muestra, así siempre ve los datos más recientes.
+ * Ventana principal de la interfaz gráfica (capa <b>Vista</b>).
+ *
+ * <p>Es un {@link JFrame} (una ventana con barra de título) dividido en tres zonas con
+ * {@link BorderLayout}: encabezado azul arriba, menú lateral a la izquierda y, en el
+ * centro, el panel de la entidad elegida.</p>
+ *
+ * <p>Los cinco paneles viven dentro de un {@link CardLayout}, que funciona como un
+ * mazo de cartas: todos están cargados, pero solo se ve el de arriba. Al elegir una
+ * opción del menú se "saca" esa carta. Cada panel vuelve a consultar la base cuando
+ * se muestra, así siempre ve los datos más recientes (incluidos los que agregaron
+ * los compañeros en la base compartida).</p>
+ *
+ * <p>Cubre la sección "Integración" de la guía: opción en el menú, instancia creada en
+ * el constructor y panel agregado al CardLayout.</p>
  */
 public class VistaPrincipalSwing extends JFrame {
 
+    /** Administrador de diseño que muestra un panel a la vez. */
     private final CardLayout tarjetas = new CardLayout();
+    /** Panel central que contiene las cinco "cartas". */
     private final JPanel contenedor = new JPanel(tarjetas);
+    /**
+     * Paneles por nombre. {@link LinkedHashMap} conserva el orden de inserción, así el
+     * menú sale en el mismo orden. {@code VistaCrudSwing<?>} significa "de cualquier entidad".
+     */
     private final Map<String, VistaCrudSwing<?>> paneles = new LinkedHashMap<>();
+    /** Botones del menú lateral, para resaltar el que está activo. */
     private final Map<String, JButton> botonesNavegacion = new LinkedHashMap<>();
 
+    /**
+     * Construye la ventana completa y muestra la pestaña de Estudiantes.
+     * Cada panel recibe solo los controladores que necesita.
+     *
+     * @param estudiantes   controlador de estudiantes
+     * @param docentes      controlador de docentes
+     * @param materias      controlador de materias
+     * @param grupos        controlador de grupos
+     * @param inscripciones controlador de inscripciones
+     */
     public VistaPrincipalSwing(ControladorEstudiante estudiantes,
                                ControladorDocente docentes,
                                ControladorMateria materias,
@@ -62,6 +90,7 @@ public class VistaPrincipalSwing extends JFrame {
         add(crearBarraLateral(), BorderLayout.WEST);
         add(contenedor, BorderLayout.CENTER);
 
+        // Al cerrar la ventana termina el programa (y el shutdown hook de Main cierra la conexión).
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(900, 560));
         setSize(1050, 640);
@@ -70,7 +99,11 @@ public class VistaPrincipalSwing extends JFrame {
         mostrar("Estudiantes");
     }
 
-    /** Cambia al panel indicado y recarga sus datos. */
+    /**
+     * Cambia al panel indicado, resalta su botón en el menú lateral y recarga sus datos.
+     *
+     * @param nombre nombre del panel, por ejemplo "Grupos"
+     */
     public void mostrar(String nombre) {
         tarjetas.show(contenedor, nombre);
         botonesNavegacion.forEach((clave, boton) ->
@@ -78,6 +111,11 @@ public class VistaPrincipalSwing extends JFrame {
         paneles.get(nombre).cargarDatos();
     }
 
+    /**
+     * Crea la barra de menú superior: Archivo (Salir), Gestión (una opción por entidad)
+     * y Ayuda (Acerca de). "Salir" simula el clic en la X de la ventana, para que se
+     * cierre igual que siempre.
+     */
     private JMenuBar crearMenu() {
         JMenuBar barra = new JMenuBar();
 
@@ -106,6 +144,7 @@ public class VistaPrincipalSwing extends JFrame {
         return barra;
     }
 
+    /** Crea la franja azul superior con el nombre del sistema. */
     private Component crearEncabezado() {
         JLabel titulo = new JLabel("  Sistema de Gestión Académica UNIAJC");
         titulo.setOpaque(true);
@@ -116,6 +155,10 @@ public class VistaPrincipalSwing extends JFrame {
         return titulo;
     }
 
+    /**
+     * Crea el menú lateral oscuro con un botón por entidad, apilados en una columna con
+     * {@link GridLayout} (0 filas = las que hagan falta, 1 columna).
+     */
     private Component crearBarraLateral() {
         JPanel barra = new JPanel(new BorderLayout());
         barra.setBackground(EstiloSwing.TEXTO);

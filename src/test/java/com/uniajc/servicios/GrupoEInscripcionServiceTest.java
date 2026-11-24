@@ -13,6 +13,11 @@ import com.uniajc.modelo.Grupo;
 import com.uniajc.modelo.InscripcionCurso;
 import com.uniajc.modelo.Materia;
 
+/**
+ * Pruebas de las reglas de negocio de {@link GrupoService} e
+ * {@link InscripcionCursoService}: existencia de registros relacionados, cruces de
+ * horario, duplicados y coherencia entre nota y estado. Usan {@link DaosEnMemoria}.
+ */
 class GrupoEInscripcionServiceTest {
 
     private DaosEnMemoria daos;
@@ -31,6 +36,7 @@ class GrupoEInscripcionServiceTest {
         daos.estudiantes.guardar(new Estudiante(0, "Ana", "Pérez", "ana@uniajc.edu.co"));   // estudiante 1
     }
 
+    /** Registra un grupo cuya materia y docente existen, y guarda el aula en mayúsculas. */
     @Test
     void registraGrupoConMateriaYDocenteExistentes() {
         Grupo grupo = new Grupo(0, 1, 1, "a-201", "Lunes 18:00-20:00");
@@ -40,6 +46,7 @@ class GrupoEInscripcionServiceTest {
         assertEquals("A-201", grupo.getAula());
     }
 
+    /** No se puede crear un grupo con una materia o un docente que no existen. */
     @Test
     void rechazaGrupoConMateriaODocenteInexistente() {
         assertThrows(IllegalArgumentException.class, () -> grupos.registrarGrupo(new Grupo(0, 9, 1, "A-1", "Lunes")));
@@ -47,6 +54,7 @@ class GrupoEInscripcionServiceTest {
         assertThrows(IllegalArgumentException.class, () -> grupos.registrarGrupo(new Grupo(0, 1, 1, "", "Lunes")));
     }
 
+    /** Ni el docente ni el aula pueden tener dos grupos en el mismo horario. */
     @Test
     void evitaCrucesDeDocenteYAulaEnElMismoHorario() {
         grupos.registrarGrupo(new Grupo(0, 1, 1, "A-201", "Lunes 18:00"));
@@ -61,6 +69,7 @@ class GrupoEInscripcionServiceTest {
         assertDoesNotThrow(() -> grupos.actualizarGrupo(new Grupo(1, 1, 1, "A-201", "Lunes 18:00")));
     }
 
+    /** Regla de integridad: no se puede borrar un grupo con estudiantes inscritos. */
     @Test
     void noEliminaGrupoConInscritos() {
         grupos.registrarGrupo(new Grupo(0, 1, 1, "A-201", "Lunes 18:00"));
@@ -69,6 +78,7 @@ class GrupoEInscripcionServiceTest {
         assertThrows(IllegalArgumentException.class, () -> grupos.eliminarGrupo(1));
     }
 
+    /** Inscribe a un estudiante y no permite inscribirlo dos veces en el mismo grupo. */
     @Test
     void inscribeYEvitaDuplicados() {
         grupos.registrarGrupo(new Grupo(0, 1, 1, "A-201", "Lunes 18:00"));
@@ -80,6 +90,7 @@ class GrupoEInscripcionServiceTest {
                 () -> inscripciones.registrarInscripcion(new InscripcionCurso(0, 1, 1, null, "ACTIVO")));
     }
 
+    /** No se puede inscribir a un estudiante o en un grupo que no existen. */
     @Test
     void rechazaEstudianteOGrupoInexistente() {
         grupos.registrarGrupo(new Grupo(0, 1, 1, "A-201", "Lunes 18:00"));
@@ -90,6 +101,7 @@ class GrupoEInscripcionServiceTest {
                 () -> inscripciones.registrarInscripcion(new InscripcionCurso(0, 1, 9, null, "ACTIVO")));
     }
 
+    /** La nota debe estar entre 0 y 5, APROBADO exige nota ≥ 3 y REPROBADO nota < 3. */
     @Test
     void validaNotaYCoherenciaConElEstado() {
         grupos.registrarGrupo(new Grupo(0, 1, 1, "A-201", "Lunes 18:00"));

@@ -11,6 +11,10 @@ import com.uniajc.modelo.Docente;
 import com.uniajc.modelo.Grupo;
 import com.uniajc.modelo.Materia;
 
+/**
+ * Pruebas de las reglas de negocio de {@link DocenteService} y {@link MateriaService},
+ * usando los DAO en memoria de {@link DaosEnMemoria}.
+ */
 class DocenteYMateriaServiceTest {
 
     private DaosEnMemoria daos;
@@ -24,6 +28,7 @@ class DocenteYMateriaServiceTest {
         materias = daos.materiaService();
     }
 
+    /** Registra un docente válido y rechaza nombres con números o especialidad vacía. */
     @Test
     void registraDocenteValidoYRechazaDatosInvalidos() {
         docentes.registrarDocente(new Docente(0, "Ing. María González", "Programación"));
@@ -35,6 +40,7 @@ class DocenteYMateriaServiceTest {
                 new Docente(0, "Sin Especialidad", " ")));
     }
 
+    /** Regla de integridad: no se puede borrar un docente que tiene grupos. */
     @Test
     void noEliminaDocenteConGruposAsignados() {
         docentes.registrarDocente(new Docente(0, "Carlos Pérez", "Bases de datos"));
@@ -43,6 +49,7 @@ class DocenteYMateriaServiceTest {
         assertThrows(IllegalArgumentException.class, () -> docentes.eliminarDocente(1));
     }
 
+    /** Los créditos deben estar entre 1 y 10. */
     @Test
     void validaRangoDeCreditos() {
         assertThrows(IllegalArgumentException.class, () -> materias.registrarMateria(new Materia(0, "Cálculo", 0)));
@@ -52,6 +59,7 @@ class DocenteYMateriaServiceTest {
         assertEquals(1, materias.obtenerTodasLasMaterias().size());
     }
 
+    /** No se permiten dos materias con el mismo nombre (sin importar mayúsculas). */
     @Test
     void noPermiteMateriasConElMismoNombre() {
         materias.registrarMateria(new Materia(0, "Bases de datos I", 4));
@@ -60,6 +68,7 @@ class DocenteYMateriaServiceTest {
                 () -> materias.registrarMateria(new Materia(0, "bases de datos i", 3)));
     }
 
+    /** Una materia con grupos no se borra; sin grupos, sí. */
     @Test
     void eliminaMateriaSoloSiNoTieneGrupos() {
         materias.registrarMateria(new Materia(0, "Física", 3));

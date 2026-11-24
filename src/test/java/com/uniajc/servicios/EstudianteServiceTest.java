@@ -10,6 +10,13 @@ import org.junit.jupiter.api.Test;
 import com.uniajc.modelo.Estudiante;
 import com.uniajc.modelo.InscripcionCurso;
 
+/**
+ * Pruebas de las reglas de negocio de {@link EstudianteService}.
+ *
+ * <p>Usan {@link DaosEnMemoria}: el servicio recibe DAO falsos que guardan en memoria,
+ * así las pruebas no se conectan a Neon ni modifican la base compartida. Cada prueba
+ * sigue el patrón preparar → actuar → comprobar.</p>
+ */
 class EstudianteServiceTest {
 
     private DaosEnMemoria daos;
@@ -21,6 +28,7 @@ class EstudianteServiceTest {
         servicio = daos.estudianteService();
     }
 
+    /** Registra un estudiante válido: le asigna ID, quita espacios sobrantes y pasa el email a minúsculas. */
     @Test
     void registraEstudianteValidoYLimpiaLosDatos() {
         Estudiante estudiante = new Estudiante(0, "  José  ", "Muñoz", " Jose.Munoz@UNIAJC.edu.co ");
@@ -33,6 +41,7 @@ class EstudianteServiceTest {
         assertEquals(1, servicio.obtenerTodosLosEstudiantes().size());
     }
 
+    /** Rechaza nombre vacío, nombre con números, email sin @ y estudiante null. */
     @Test
     void rechazaCamposVaciosNombresConNumerosYEmailInvalido() {
         assertThrows(IllegalArgumentException.class,
@@ -44,6 +53,7 @@ class EstudianteServiceTest {
         assertThrows(IllegalArgumentException.class, () -> servicio.registrarEstudiante(null));
     }
 
+    /** No permite registrar un email que ya existe, aunque esté escrito con otras mayúsculas. */
     @Test
     void noPermiteEmailRepetidoAunqueCambienLasMayusculas() {
         servicio.registrarEstudiante(new Estudiante(0, "Ana", "Pérez", "ana@uniajc.edu.co"));
@@ -53,6 +63,7 @@ class EstudianteServiceTest {
         assertTrue(error.getMessage().contains("Ya existe"));
     }
 
+    /** Al actualizar, el estudiante puede conservar su propio email sin que cuente como repetido. */
     @Test
     void actualizaConservandoSuPropioEmail() {
         Estudiante estudiante = new Estudiante(0, "Ana", "Pérez", "ana@uniajc.edu.co");
@@ -64,6 +75,7 @@ class EstudianteServiceTest {
         assertEquals("Ana María", servicio.buscarEstudiantePorId(1).orElseThrow().getNombre());
     }
 
+    /** No se puede actualizar ni eliminar un ID que no existe (ni el ID 0). */
     @Test
     void noActualizaNiEliminaEstudiantesInexistentes() {
         assertThrows(IllegalArgumentException.class,
@@ -72,6 +84,7 @@ class EstudianteServiceTest {
         assertThrows(IllegalArgumentException.class, () -> servicio.eliminarEstudiante(0));
     }
 
+    /** Regla de integridad: no se puede borrar un estudiante que tiene inscripciones. */
     @Test
     void noEliminaEstudianteConInscripciones() {
         servicio.registrarEstudiante(new Estudiante(0, "Ana", "Pérez", "ana@uniajc.edu.co"));

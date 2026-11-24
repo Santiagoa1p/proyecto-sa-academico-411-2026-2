@@ -19,7 +19,14 @@ import com.uniajc.controlador.ControladorInscripcionCurso;
 import com.uniajc.controlador.ControladorMateria;
 import com.uniajc.servicios.DaosEnMemoria;
 
-/** Simula a un usuario escribiendo en la consola. */
+/**
+ * Pruebas de la interfaz de consola que simulan a un usuario escribiendo.
+ *
+ * <p>En vez del teclado, a {@link LectorConsola} se le da un texto preparado
+ * ({@link java.io.ByteArrayInputStream}), y en vez de la pantalla, se captura lo que
+ * imprime ({@link java.io.ByteArrayOutputStream}). Luego se revisa que la salida
+ * contenga los mensajes esperados. Usa los DAO en memoria, así que no toca Neon.</p>
+ */
 class VistaConsolaTest {
 
     private DaosEnMemoria daos;
@@ -29,6 +36,13 @@ class VistaConsolaTest {
         daos = new DaosEnMemoria();
     }
 
+    /**
+     * Ejecuta el menú de consola como si un usuario escribiera las líneas indicadas
+     * (una por cada Enter).
+     *
+     * @param lineas lo que "escribe" el usuario, en orden
+     * @return todo lo que el programa imprimió
+     */
     private String ejecutar(String... lineas) {
         String entrada = String.join("\n", lineas) + "\n";
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -44,6 +58,7 @@ class VistaConsolaTest {
         return bytes.toString(StandardCharsets.UTF_8);
     }
 
+    /** Simula a un usuario que registra, lista, actualiza y elimina un estudiante desde el menú. */
     @Test
     void cicloCompletoDeEstudiante() {
         String salida = ejecutar(
@@ -60,6 +75,7 @@ class VistaConsolaTest {
         assertTrue(daos.estudiantes.datos.isEmpty());
     }
 
+    /** Si el usuario escribe datos inválidos, se muestra el error y el menú sigue funcionando. */
     @Test
     void muestraErroresDeValidacionSinCerrarElPrograma() {
         String salida = ejecutar(
@@ -74,6 +90,7 @@ class VistaConsolaTest {
         assertEquals(1, daos.materias.datos.size());
     }
 
+    /** Flujo completo por consola: materia, docente, grupo, estudiante e inscripción con nota. */
     @Test
     void registraGrupoEInscripcionConNota() {
         String salida = ejecutar(
@@ -90,6 +107,7 @@ class VistaConsolaTest {
         assertEquals(4.5f, daos.inscripciones.datos.get(1).getNotaFinal());
     }
 
+    /** Si la entrada termina de golpe (Ctrl+Z), el programa se despide en vez de fallar. */
     @Test
     void terminaBienSiSeAcabaLaEntrada() {
         String salida = ejecutar("1");

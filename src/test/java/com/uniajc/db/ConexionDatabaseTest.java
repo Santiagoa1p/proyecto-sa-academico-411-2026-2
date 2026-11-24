@@ -7,8 +7,15 @@ import java.sql.SQLException;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Pruebas de la conversión de URLs de {@link ConexionDatabase}.
+ *
+ * <p>Solo prueban el método {@code normalizar}, que no se conecta a nada, así que
+ * corren sin internet y sin tocar Neon.</p>
+ */
 class ConexionDatabaseTest {
 
+    /** La URL tal como la entrega Neon se convierte a JDBC, y el usuario y la clave se extraen de ella (decodificando %40 → @). */
     @Test
     void convierteLaUrlDeNeonAFormatoJdbc() throws SQLException {
         ConexionDatabase.DatosConexion datos = ConexionDatabase.normalizar(
@@ -20,6 +27,7 @@ class ConexionDatabaseTest {
         assertEquals("abc@123", datos.clave());
     }
 
+    /** Si USERNAME y PASSWORD vienen escritos aparte, tienen prioridad sobre los que trae la URL. */
     @Test
     void respetaUsuarioYClaveEscritosAparte() throws SQLException {
         ConexionDatabase.DatosConexion datos = ConexionDatabase.normalizar(
@@ -30,6 +38,7 @@ class ConexionDatabaseTest {
         assertEquals("clave", datos.clave());
     }
 
+    /** Una URL que ya está en formato JDBC no se modifica. */
     @Test
     void dejaIgualUnaUrlJdbc() throws SQLException {
         ConexionDatabase.DatosConexion datos = ConexionDatabase.normalizar(
@@ -38,6 +47,7 @@ class ConexionDatabaseTest {
         assertEquals("jdbc:postgresql://host/base?sslmode=require", datos.url());
     }
 
+    /** Se rechazan URLs con espacios o con un prefijo que no es de PostgreSQL. */
     @Test
     void rechazaUrlsConEspaciosOFormatoDesconocido() {
         assertThrows(SQLException.class, () -> ConexionDatabase.normalizar("jdbc:postgresql://host/ base", "", ""));

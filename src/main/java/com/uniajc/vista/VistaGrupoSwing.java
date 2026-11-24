@@ -13,7 +13,13 @@ import com.uniajc.controlador.ControladorGrupo;
 import com.uniajc.controlador.ControladorMateria;
 import com.uniajc.modelo.Grupo;
 
-/** Panel Swing para gestionar grupos. Materia y docente se eligen de una lista. */
+/**
+ * Panel Swing para gestionar grupos. Materia y docente se eligen de una lista.
+ *
+ * <p>Hereda de {@link VistaCrudSwing} toda la pantalla (buscador, tabla, botones y
+ * diálogo) y solo define lo propio de esta entidad: las columnas, los campos del
+ * formulario y a qué método del controlador llamar.</p>
+ */
 public class VistaGrupoSwing extends VistaCrudSwing<Grupo> {
 
     private final ControladorGrupo controlador;
@@ -28,6 +34,10 @@ public class VistaGrupoSwing extends VistaCrudSwing<Grupo> {
     private JTextField campoAula;
     private JTextField campoHorario;
 
+    /**
+     * Crea el panel. {@code super(...)} le pasa a {@link VistaCrudSwing} el título,
+     * el nombre de la entidad y los encabezados de las columnas.
+     */
     public VistaGrupoSwing(ControladorGrupo controlador, ControladorMateria materias, ControladorDocente docentes) {
         super("Grupos", "grupo", new String[]{"ID", "Materia", "Docente", "Aula", "Horario"});
         this.controlador = controlador;
@@ -36,6 +46,7 @@ public class VistaGrupoSwing extends VistaCrudSwing<Grupo> {
         anchosColumnas(50, 280, 180, 80, 190);
     }
 
+    // Operaciones básicas: cada una solo delega en el controlador (una línea cada una).
     @Override protected List<Grupo> listar() { return controlador.listar(); }
     @Override protected Optional<Grupo> buscar(int id) { return controlador.buscar(id); }
     @Override protected Grupo nuevo() { return new Grupo(); }
@@ -43,6 +54,11 @@ public class VistaGrupoSwing extends VistaCrudSwing<Grupo> {
     @Override protected void actualizar(Grupo g) { controlador.actualizar(g); }
     @Override protected void eliminar(int id) { controlador.eliminar(id); }
 
+    /**
+     * Antes de llenar la tabla, arma diccionarios ({@code Map}) de ID → nombre para
+     * mostrar nombres en vez de números. {@code getOrDefault} en {@link #fila} usa
+     * "#ID" si el registro relacionado ya no existe.
+     */
     @Override
     protected void antesDeCargar() {
         nombresMaterias.clear();
@@ -51,6 +67,7 @@ public class VistaGrupoSwing extends VistaCrudSwing<Grupo> {
         docentes.listar().forEach(d -> nombresDocentes.put(d.getIdDocente(), d.getNombre()));
     }
 
+    /** Convierte un registro en una fila de la tabla (mismo orden que las columnas). */
     @Override
     protected Object[] fila(Grupo g) {
         return new Object[]{
@@ -61,6 +78,10 @@ public class VistaGrupoSwing extends VistaCrudSwing<Grupo> {
                 g.getHorario()};
     }
 
+    /**
+     * Agrega los campos al formulario. Si {@code actual} es {@code null} (registrar),
+     * quedan vacíos; si no (editar), se llenan con los valores actuales.
+     */
     @Override
     protected void construirFormulario(Formulario f, Grupo actual) {
         List<Opcion> opcionesMateria = materias.listar().stream()
@@ -79,6 +100,10 @@ public class VistaGrupoSwing extends VistaCrudSwing<Grupo> {
         f.nota("Ejemplo de horario: Lunes 18:00-20:00");
     }
 
+    /**
+     * Copia lo escrito en el formulario hacia el objeto. Aquí no se valida nada: las
+     * reglas las aplica el servicio cuando el objeto llega a él.
+     */
     @Override
     protected void leerFormulario(Grupo destino) {
         destino.setIdMateria(idElegido(campoMateria, "Primero registra al menos una materia."));
